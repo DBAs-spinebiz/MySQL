@@ -1,0 +1,24 @@
+--table backup before activity
+mysqldump -u root -p qarms qarms_trn_vodafone_api_tracking > qarms_trn_vodafone_api_tracking.sql
+
+--check schedular
+SHOW VARIABLES LIKE 'event_scheduler';
+
+--enable schedular
+SET GLOBAL event_scheduler = ON;
+
+-- Create an event that runs every day at midnight
+DELIMITER $$
+CREATE EVENT purge_qarms_trn_vodafone_api_tracking
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_TIMESTAMP
+DO
+BEGIN
+  DELETE FROM qarms_trn_vodafone_api_tracking WHERE created_on < DATE_SUB(NOW(), INTERVAL 7 DAY);
+END;
+$$
+DELIMITER ;
+
+--check event created 
+SHOW EVENTS;
+
